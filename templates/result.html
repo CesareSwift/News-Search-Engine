@@ -1,0 +1,493 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>News search</title>
+
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='semantic.css')}}" type="text/css">
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='search.css')}}" type="text/css">
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='semantic.min.css')}}" type="text/css">
+    <script type="text/javascript" src="{{ url_for('static', filename='jquery-3.3.1.js')}}"></script>
+    <script type="text/javascript" src="{{ url_for('static', filename='semantic.js')}}"></script>
+    <script type="text/javascript" src="{{ url_for('static', filename='semantic.min.js')}}"></script>
+    <script type="text/javascript" src="{{ url_for('static', filename='search.js')}}"></script>
+
+
+
+    <style>
+
+
+        p {
+            padding-left: 15%;
+            padding-right: 15%;
+            font-size: 17px
+        }
+
+
+        .ui.footer.segment {
+            margin: 5em 0em 0em;
+            padding: 5em 0em;
+        }
+
+        .sixteen.wide.column {
+            background-color: #000000;
+        }
+
+        mark.high {
+            background-color: rgba(220, 0, 66, 0.45);
+        }
+        .ui.message{
+            position: sticky;
+            top: 20px;
+        }
+
+
+        body {
+
+            background-image: url("{{ url_for('static', filename='background.png') }}"); /*设置背景图片*/
+            background-repeat: no-repeat; /*图片适应窗口大小，这里设置的是不进行平铺*/
+            background-attachment: fixed; /*图片相对于浏览器固定,这里设置背景图片固定，不随内容滚动*/
+            background-origin: border-box; /*从边框区域显示*/
+            background-size: cover; /*指定图片大小，此时会保持图像的纵横比并将图像缩放成将完全覆盖背景定位区域的最小大小*/
+        }
+    </style>
+    <script>
+
+    </script>
+    <script>
+        var cpage
+        $(document)
+            .ready(function () {})
+        $('.ui.sticky')
+            .sticky({
+                context: $('#container')
+            })
+        ;
+
+
+        resultfinal = []
+        group = []
+        group.push('{{songs.genre}}')
+        var totalcot='{{songs.count}}'
+        var page='{{songs.pages}}'
+        cpage='{{songs.cur_page}}'
+
+
+
+    </script>
+    {% for genre in songs.allsongs %}
+    <script type="text/javascript">
+        resultdata = []
+        var helname = '{{genre.highlight.name}}'
+        var helcont = '{{genre.highlight.content}}'
+        var hel = []
+        var tempname = '{{genre.name}}';
+        var tempcontent = '{{genre.content}}';
+        var tempurl = '{{genre.URL}}'
+        var tempdate = '{{genre.date}}'
+        var tempartist = '{{genre.Artist}}'
+        hel.push({'hn': helname})
+        hel.push({'ht': helcont})
+
+
+        resultdata.push({'songname': tempname})
+        resultdata.push({'songcontent': tempcontent})
+        resultdata.push({'high': hel})
+        resultdata.push({'URL': tempurl})
+        resultdata.push({'date': tempdate})
+        resultdata.push(({'people': tempartist}))
+        group.push({'song': resultdata})
+
+    </script>
+    {% endfor %}
+    <script>
+        resultfinal.push(group)
+    </script>
+
+    <script>
+        var searchcot=1
+        $(document)
+            .ready(function () {
+
+                var $container2 = $("#container2");
+                $container2.append("<br/><br/><h2 class=\"ui header\" style=\"margin: 2.5em;color: #FFFFF0\">There are "+totalcot+" search results &nbsp;&nbsp;&nbsp;&nbsp;Result page: "+Math.min(searchcot,page)+"/"+page+"</h2>");
+                var $container = $("#container");
+
+                $("#info").empty();
+                var $info = $("#info");
+                $info.append("<li>There are "+totalcot+" search results &nbsp;&nbsp;&nbsp;&nbsp;Result page: "+Math.min(searchcot,page)+"/"+page+"</li>");
+
+                function addele(name, gene, cont, dat, u) {
+                    newstr = cont
+                    $container.append("<div class=\"column\" > <div class=\"ui fluid raised card\"><div class=\"content\"><a class=\"header\" href=\"" + u + "\">" +
+                        name +
+                        "</a><div class=\"meta\"><span class=\"right floated time\">" +
+                        dat +
+                        "</span><span class=\"category\">" +
+                        gene +
+                        "</span></div><div class=\"description\"><p>" +
+                        newstr +
+                        "</p></div></div> </div></div>");
+                }
+                redct = []
+                redcn = []
+                for (v of resultfinal[0].slice(1)) {
+                    temredct = []
+                    temredcn = []
+
+                    console.log('old clt'+ ctl)
+
+                    var ctl = v['song'][2]['high'][1]['ht'];
+                    var nl = v['song'][2]['high'][0]['hn'];
+                    var temp1 = ctl.split('),')
+                    // console.log(ctl);
+                    for (s of temp1) {
+                        templist = []
+                        for (k of ((s.replace(/([.*+?^=!:${}()| [\]\/\\])/g, '')).split(','))) {
+                            templist.push(k)
+                        }
+                        temredct.push(templist)
+                    }
+                    var temp2 = nl.split('),')
+                    for (s of temp2) {
+                        templist = []
+                        for (k of ((s.replace(/([.*+?^=!:${}()| [\]\/\\])/g, '')).split(','))) {
+                            templist.push(k)
+                        }
+                        temredcn.push(templist)
+                    }
+                    redct.push(temredct)
+                    redcn.push(temredcn)
+                }
+                cot = 0
+                for (v of resultfinal[0].slice(1)) {
+                    var ctt = v['song'][1]['songcontent'];
+                    ctt = ctt.replace(/&#39;/g, '\'')
+                    ctt = ctt.replace(/&#34;/g, '\'')
+                    var cn = v['song'][0]['songname'];
+                    var datetime = v['song'][4]['date'].slice(0, 10);
+                    var peo = v['song'][5]['people'];
+                    var url = v['song'][3]['URL'];
+                    tempwriter = []
+                    var peotemp = peo.split(',')
+                    for (s of peotemp) {
+                        for (k of ((s.replace(/([.*+?^=!:${}()|[\]\/\\])/g, '')).split(','))) {
+                            k = k.replace(/&#39;/g, '')
+                            tempwriter.push(k)
+                        }
+                    }
+                    var name
+                    console.log(tempwriter[0]+" this is name")
+                    if (tempwriter[0] == '') {
+                        name = "Anonymous"
+                    } else {
+                        name = tempwriter[0]
+                    }
+                    cn = cn.replace(/&#39;/g, '\'')
+                    cn = cn.replace(/&#34;/g, '\'')
+                    var cttlist = ctt.split('')
+                    var cnlist = cn.split('')
+                    ctlen = cttlist.length
+                    for (var ele = 0; ele < ctlen; ele++)
+                        for (ele in cttlist) {
+                            for (ex in redct[cot]) {
+                                if (ele >= parseInt(redct[cot][ex][0]) && ele < parseInt(redct[cot][ex][1])) {
+                                    tempch = cttlist[ele]
+                                    cttlist[ele] = "<mark class=\"high\">" + tempch + "</mark>"
+                                }
+                            }
+                        }
+                    for (ele in cnlist) {
+                        for (ex in redcn[cot]) {
+                            if (ele >= parseInt(redcn[cot][ex][0]) && ele < parseInt(redcn[cot][ex][1])) {
+                                tempch = cnlist[ele]
+                                cnlist[ele] = "<mark class=\"high\">" + tempch + "</mark>"
+                            }
+                        }
+                    }
+                    var n = cnlist.join("")
+                    var ct = cttlist.join("")
+                    cot = cot + 1
+                    addele(n, name, ct, datetime, url)
+
+                }
+            })
+
+        function nextpage(){
+            txt='testdata'
+            $.post("url",{'number':searchcot},function(data,status){
+                //alert("Data: " + data + "nStatus: " + status);
+               // console.log(status)
+               // console.log(data)
+
+                morepages(data)
+            });
+            searchcot=searchcot+1
+        }
+
+        function Top() {
+
+            document.body.scrollTop = 0;
+            document.documentElement.scrollTop = 0;
+        }
+
+    </script>
+
+
+
+
+    <script>
+
+
+        function morepages(data) {
+
+            //console.log(data['allsongs'])
+
+                resultfinal = []
+                group = []
+                group.push(data['genre'])
+                var totalcot=data['count']
+                var page=data['pages']
+                cpage=data['cur_page']
+                console.log(cpage+" ---1212")
+
+
+            for (let i = 0; i < data['allsongs'].length; ++i) {
+
+                resultdata = []
+                var helname = data['allsongs'][i]['highlight']['name']
+                var helcont = data['allsongs'][i]['highlight']['content']
+                var hel = []
+                var tempname = data['allsongs'][i]['name']
+                var tempcontent = data['allsongs'][i]['content']
+                var tempurl = data['allsongs'][i]['URL']
+                var tempdate = data['allsongs'][i]['date']
+                var tempartist = data['allsongs'][i]['Artist']
+
+                //console.log(helname+"--------------------")
+                hel.push({'hn': helname})
+                hel.push({'ht': helcont})
+
+                resultdata.push({'songname': tempname})
+                resultdata.push({'songcontent': tempcontent})
+                resultdata.push({'high': hel})
+                resultdata.push({'URL': tempurl})
+                resultdata.push({'date': tempdate})
+                resultdata.push(({'people': tempartist}))
+                group.push({'song': resultdata})
+
+            }
+
+
+
+        resultfinal.push(group)
+
+
+
+
+            var $container = $("#container");
+
+            function addele(name, gene, cont, dat, u) {
+                newstr = cont
+                $container.append("<div class=\"column\" > <div class=\"ui fluid raised card\"><div class=\"content\"><a class=\"header\" href=\"" + u + "\">" +
+                    name +
+                    "</a><div class=\"meta\"><span class=\"right floated time\">" +
+                    dat +
+                    "</span><span class=\"category\">" +
+                    gene +
+                    "</span></div><div class=\"description\"><p>" +
+                    newstr +
+                    "</p></div></div> </div></div>");
+            }
+            redct = []
+            redcn = []
+            for (v of resultfinal[0].slice(1)) {
+                temredct = []
+                temredcn = []
+                //var ctl = v['song'][2]['high'][1]['ht'];
+                //var nl = v['song'][2]['high'][0]['hn'];
+
+                var temredct = v['song'][2]['high'][1]['ht'];
+                var temredcn = v['song'][2]['high'][0]['hn'];
+
+                console.log(temredct+"this is clt")
+                /*
+                var temp1 = ctl.split('),')
+                for (s of temp1) {
+                    templist = []
+                    for (k of ((s.replace(/([.*+?^=!:${}()| [\]\/\\])/g, '')).split(','))) {
+                        templist.push(k)
+                    }
+                    temredct.push(templist)
+                }
+                var temp2 = nl.split('),')
+                for (s of temp2) {
+                    templist = []
+                    for (k of ((s.replace(/([.*+?^=!:${}()| [\]\/\\])/g, '')).split(','))) {
+                        templist.push(k)
+                    }
+                    temredcn.push(templist)
+                }
+
+                 */
+                redct.push(temredct)
+                redcn.push(temredcn)
+            }
+            cot = 0
+            for (v of resultfinal[0].slice(1)) {
+                var ctt = v['song'][1]['songcontent'];
+
+                ctt = ctt.replace(/&#39;/g, '\'')
+                ctt = ctt.replace(/&#34;/g, '\'')
+
+                var cn = v['song'][0]['songname'];
+                var datetime = v['song'][4]['date'].slice(0, 10);
+                var peo = v['song'][5]['people'];
+                var url = v['song'][3]['URL'];
+               // console.log("this is url " + url)
+                tempwriter = []
+                tempwriter = peo;
+                /*
+                var peotemp = peo.split(',')
+                for (s of peotemp) {
+                    for (k of ((s.replace(/([.*+?^=!:${}()|[\]\/\\])/g, '')).split(','))) {
+                        k = k.replace(/&#39;/g, '')
+                        tempwriter.push(k)
+                    }
+                }
+
+                 */
+
+                var name
+                if (tempwriter[0] == '') {
+                    name = "Anonymous"
+                } else {
+                    name = tempwriter[0]
+                }
+                cn = cn.replace(/&#39;/g, '\'')
+                cn = cn.replace(/&#34;/g, '\'')
+                var cttlist = ctt.split('')
+                var cnlist = cn.split('')
+                ctlen = cttlist.length
+                for (var ele = 0; ele < ctlen; ele++)
+                    for (ele in cttlist) {
+                        for (ex in redct[cot]) {
+                            if (ele >= parseInt(redct[cot][ex][0]) && ele < parseInt(redct[cot][ex][1])) {
+                                tempch = cttlist[ele]
+                                cttlist[ele] = "<mark class=\"high\">" + tempch + "</mark>"
+                            }
+                        }
+                    }
+                for (ele in cnlist) {
+                    for (ex in redcn[cot]) {
+                        if (ele >= parseInt(redcn[cot][ex][0]) && ele < parseInt(redcn[cot][ex][1])) {
+                            tempch = cnlist[ele]
+                            cnlist[ele] = "<mark class=\"high\">" + tempch + "</mark>"
+                        }
+                    }
+                }
+                var n = cnlist.join("")
+                var ct = cttlist.join("")
+                cot = cot + 1
+                addele(n, name, ct, datetime, url)
+                //var $container2 = $("#container2");
+
+
+
+            }
+            $("#container2").empty();
+            var $container2 = $("#container2");
+            $container2.append("<br/><br/><h2 class=\"ui header\" style=\"margin: 2.5em;color: #FFFFF0\">There are "+totalcot+" search results &nbsp;&nbsp;&nbsp;&nbsp;Result page: "+Math.min(searchcot,page)+"/"+page+"</h2>");
+
+            $("#info").empty();
+            var $info = $("#info");
+            $info.append("<li>There are "+totalcot+" search results &nbsp;&nbsp;&nbsp;&nbsp;Result page: "+Math.min(searchcot,page)+"/"+page+"</li>");
+
+        }
+    </script>
+
+
+</head>
+
+
+<body>
+
+<div class="ui grid">
+    <div class="sixteen wide column">
+        <div class="ui large secondary inverted pointing menu">
+
+            <div class="ui four column grid" id="container2">
+            </div>
+        </div>
+
+
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
+        <div class="ui center aligned container">
+            <button class=" ui  button" onclick="window.location.href='../../search'">Next Search</button>
+
+        </div>
+        <br/>
+    </div>
+    <br/>
+    <br/>
+
+    <script>
+
+    </script>
+
+
+
+    <div class="two wide column">
+
+        <div class="ui message">
+            <div class="header">
+                Result INFO
+            </div>
+
+
+            <ul class="list" >
+
+                <div id="info">
+
+                </div>
+
+                <br/>
+                <button class=" ui  button" onclick="Top()">Go Top</button>
+            </ul>
+        </div>
+
+
+    </div>
+    <div class="twelve wide column" id="context2">
+
+        <div class="ui four column grid" id="container">
+        </div>
+
+        <div class="ui center aligned container">
+
+
+
+        </div>
+
+    </div>
+
+    <div class="three wide column">
+    </div>
+
+</div>
+
+<div class="ui center aligned container">
+    <button class="positive ui button" onclick="nextpage()">Load more</button>
+</div>
+
+
+<div class="ui vertical footer segment" id="lastitem">
+    <div class="ui center aligned container">
+
+        <div>
+            &nbsp©&nbsp Copyright 2022 TTDS Group 22
+        </div>
+    </div>
+</div>
+</body>
+</html>

@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>News search</title>
+
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='semantic.css')}}" type="text/css">
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='search.css')}}" type="text/css">
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='semantic.min.css')}}" type="text/css">
+    <script type="text/javascript" src="{{ url_for('static', filename='jquery-3.3.1.js')}}"></script>
+    <script type="text/javascript" src="{{ url_for('static', filename='semantic.js')}}"></script>
+
+    <script type="text/javascript" src="{{ url_for('static', filename='semantic.min.js')}}"></script>
+    <script type="text/javascript" src="{{ url_for('static', filename='search.js')}}"></script>
+
+    <script src="https://cdn.jsdelivr.net/npm/jquery@3.3.1/dist/jquery.min.js"></script>
+    <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/fomantic-ui@2.8.8/dist/semantic.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/fomantic-ui@2.8.8/dist/semantic.min.js"></script>
+
+    <style>
+
+
+
+        p {
+            padding-left: 15%;
+            padding-right: 15%;
+            font-size: 17px
+        }
+
+
+
+        .ui.footer.segment {
+            margin: 5em 0em 0em;
+            padding: 5em 0em;
+        }
+
+        .sixteen.wide.column {
+            background-color: #000000;
+        }
+
+        body {
+            /*background: rgb(185, 246, 246);*//*设置颜色背景*/
+            background-image: url("{{ url_for('static', filename='background.jpg') }}");
+            background-repeat: no-repeat;
+            background-attachment: fixed;
+            background-origin: border-box;
+            background-size: cover;
+        }
+
+    </style>
+    <script>
+        var sta
+        var end
+        function search() {
+            sta = $("input[id='start']").val();
+            end = $("input[id='end']").val();
+            console.log(sta)
+            //console.log(end)
+        }
+        var categoryContent = [{category: '', title: ''}];
+        var datetime;
+        $(document)
+            .ready(function () {
+                $('#rangestart').calendar({
+                    type: 'date',
+                    endCalendar: $('#rangeend')
+                });
+                $('#rangeend').calendar({
+                    type: 'date',
+                    startCalendar: $('#rangestart')
+                });
+                $('.ui.kk.search')
+
+                    .search({
+                        showNoResults: false,
+                        cache: false,
+                        searchDelay: 500,
+
+                        apiSettings: {
+                            url: '?q={query}',
+                            method: 'POST',
+                            data: {
+                                name: 'query',
+
+
+                            }
+                        },
+
+
+                        fields: {
+                            results: 'items',
+                            title: 'name',
+
+                        },
+                        minCharacters: 3
+
+                    })
+                ;
+
+
+                $('.ui.sear.form').form({
+                    fields: {
+                        keyword: {
+                            identifier: 'keyword',
+                            rules: [{
+                                type: 'empty',
+                                prompt: 'Please enter a song name'
+                            }]
+                        }
+                    }
+                });
+            })
+
+    </script>
+</head>
+
+
+<body>
+
+<div class="ui grid">
+    <div class="sixteen wide column">
+        <!-- Following Menu -->
+
+
+        <div class="ui large secondary inverted pointing menu">
+
+
+        </div>
+
+
+        <h3 class="ui header" style="margin: 2.5em;color: #FFFFF0">Find news here</h3>
+
+
+        <div class="ui center aligned container">
+
+
+            <form class="ui sear form segment success" method="post">
+                <div class="field">
+                    <div class="ui kk search">
+                        <div class="ui icon input">
+                            <!--<input class="prompt" type="text" placeholder="Search countries..." >-->
+                            <input class="prompt" placeholder="keyword" name="keyword" type="text" value="">
+
+
+                            <div class="ui primary submit button">Search</div>
+
+                        </div>
+                        <div class="results"></div>
+
+                    </div>
+                    <p></p>
+                    <p></p>
+                    <div class="ui form">
+                        <div class="two fields">
+                            <div class="field">
+                                <label>Start date</label>
+                                <div class="ui calendar" id="rangestart">
+                                    <div class="ui input left icon">
+                                        <i class="calendar icon"></i>
+                                        <input type="text" name="star" placeholder="Start" id="start" >
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="field">
+                                <label>End date</label>
+                                <div class="ui calendar" id="rangeend" id = "end">
+                                    <div class="ui input left icon">
+                                        <i class="calendar icon"></i>
+                                        <input type="text" name="end" placeholder="End">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+
+            </form>
+
+        </div>
+
+
+        <br/>
+    </div>
+
+
+    <div class="three wide column">
+    </div>
+
+
+    <div class="twelve wide column">
+
+    </div>
+</div>
+
+
+<div class="ui vertical footer segment">
+    <div class="ui center aligned container">
+
+        <div>
+            &nbsp©&nbsp Copyright 2022 TTDS Group HE
+        </div>
+    </div>
+</div>
+
+</body>
+</html>
